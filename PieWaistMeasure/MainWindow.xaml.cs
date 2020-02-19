@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -87,6 +88,7 @@ namespace PieWaistMeasure
             //CSV conversion must go here with appropriate handling. Currently checking for decimal point at string position 2
             try
             {
+                //Update to accomodate PIE format. Conversions might be neccessary
                 if (arrayMeasurements[0, 1].Substring(0, 2).Contains(".") && arrayMeasurements[1, 1].Substring(0, 2).Contains("."))
                 {
                     string csv = ArrayToCsv(arrayMeasurements);
@@ -98,7 +100,7 @@ namespace PieWaistMeasure
                 }
                 else
                 {
-                    MessageBox.Show("Incorrect height format. \n\n Please ensure you've collected results using Bluetooth Laser");
+                    MessageBox.Show("Incorrect height format. \n\n Please ensure you've collected results using Bluetooth waist measure");
                 }
             }
             catch
@@ -312,15 +314,43 @@ namespace PieWaistMeasure
         }
 
 
-        string[,] arrayMeasurements = new string[2, 2];
+        string[,] arrayMeasurements = new string[3, 6];
+        private void initialiseSurveyorInfo()
+        {
+            arrayMeasurements[0, 0] = "MeasureType";
+            arrayMeasurements[0, 1] = "Measurement";
+            arrayMeasurements[0, 2] = "Qtr";
+            arrayMeasurements[0, 3] = "MB";
+            arrayMeasurements[0, 4] = "HHID";
+            arrayMeasurements[0, 5] = "RespondentID";
+            string[] respondentInfo = GetRespondentIdentifiers();
+            arrayMeasurements[1, 2] = respondentInfo[0];
+            arrayMeasurements[1, 3] = respondentInfo[1];
+            arrayMeasurements[1, 4] = respondentInfo[2];
+            arrayMeasurements[1, 5] = respondentInfo[3];
+            arrayMeasurements[2, 2] = respondentInfo[0];
+            arrayMeasurements[2, 3] = respondentInfo[1];
+            arrayMeasurements[2, 4] = respondentInfo[2];
+            arrayMeasurements[2, 5] = respondentInfo[3];
+
+
+        }
+
+        private string[] GetRespondentIdentifiers()
+        {
+            string respIDs = File.ReadLines(@"C:\NZHS\surveyinstructions\MeasurementInfo.txt").First();
+            string[] respIDSplit = respIDs.Split('+');
+            return respIDSplit;
+        }
+
         private void H1Measurement_TextChanged(object sender, TextChangedEventArgs e)
         {
 
             if (Waist1Measurement.Text.Length > 5)
             {
                 string rounded = Waist1Measurement.Text.Substring(0, 5);
-                arrayMeasurements[0, 0] = "WA";
-                arrayMeasurements[0, 1] = rounded;
+                arrayMeasurements[1, 0] = "WA";
+                arrayMeasurements[1, 1] = rounded;
                 updateH1Text(rounded.ToString());
                 Keyboard.Focus(Waist2Measurement);
             }
@@ -331,8 +361,8 @@ namespace PieWaistMeasure
             if (Waist2Measurement.Text.Length > 5)
             {
                 string rounded = Waist2Measurement.Text.Substring(0, 5);
-                arrayMeasurements[1, 0] = "WA";
-                arrayMeasurements[1, 1] = rounded;
+                arrayMeasurements[2, 0] = "WA";
+                arrayMeasurements[2, 1] = rounded;
                 updateH2Text(rounded.ToString());
                 Keyboard.Focus(Waist1Measurement);
             }
