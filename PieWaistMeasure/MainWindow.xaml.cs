@@ -18,6 +18,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Enumeration;
 
@@ -28,6 +29,8 @@ namespace PieWaistMeasure
     /// </summary>
     public partial class MainWindow : Window
     {
+        System.Windows.Threading.DispatcherTimer _typingTimer;
+        System.Windows.Threading.DispatcherTimer _typingTimer1;
         public MainWindow()
         {
             InitializeComponent();
@@ -45,6 +48,7 @@ namespace PieWaistMeasure
             }
             //MonitorConnection();
             this.Topmost = true;
+          
             Keyboard.Focus(Waist1Measurement);
 
             StartBleDeviceWatcher();
@@ -343,29 +347,86 @@ namespace PieWaistMeasure
             return respIDSplit;
         }
 
-        private void H1Measurement_TextChanged(object sender, TextChangedEventArgs e)
+        private void handleTypingTimerTimeout(object sender, EventArgs e)
         {
+            
+            var timer = sender as DispatcherTimer; // WPF
+            if (timer == null)
+            {
+                return;
+            }
+            //Do operation here
+            if(waist1orwaist2 == "waist1")
+            {
+                arrayMeasurements[1, 0] = "WA";
+                arrayMeasurements[1, 1] = Waist1Measurement.Text;
+                Keyboard.Focus(Waist2Measurement);
+            }
+            else if(waist1orwaist2 == "waist2")
+            {
+                arrayMeasurements[2, 0] = "WA";
+                arrayMeasurements[2, 1] = Waist2Measurement.Text;
+                Keyboard.Focus(Waist1Measurement);
+            }
 
-            if (Waist1Measurement.Text.Length > 5)
+
+
+            // The timer must be stopped! We want to act only once per keystroke.
+            timer.Stop();
+            _typingTimer = null;
+            _typingTimer1 = null;
+            
+        }
+
+        string waist1orwaist2 = null;
+        private void Waist1Measurement_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (_typingTimer == null)
+            {
+                _typingTimer = new DispatcherTimer();
+                _typingTimer.Interval = TimeSpan.FromMilliseconds(2000);
+                waist1orwaist2 = "waist1";
+                _typingTimer.Tick += new EventHandler(this.handleTypingTimerTimeout);
+            }
+            _typingTimer.Stop(); // Resets the timer
+            _typingTimer.Tag = (sender as TextBox).Text; // This should be done with EventArgs
+            _typingTimer.Start();
+
+
+
+
+            /*if (Waist1Measurement.Text.Length > 5)
             {
                 string rounded = Waist1Measurement.Text.Substring(0, 5);
                 arrayMeasurements[1, 0] = "WA";
                 arrayMeasurements[1, 1] = rounded;
                 updateH1Text(rounded.ToString());
                 Keyboard.Focus(Waist2Measurement);
-            }
+            }*/
+
         }
 
-        private void H2Measurement_TextChanged(object sender, TextChangedEventArgs e)
+        private void Waist2Measurement_TextChanged(object sender, TextChangedEventArgs e)
         {
-            if (Waist2Measurement.Text.Length > 5)
+            if (_typingTimer1 == null)
+            {
+                _typingTimer1 = new DispatcherTimer();
+                _typingTimer1.Interval = TimeSpan.FromMilliseconds(2000);
+                waist1orwaist2 = "waist2";
+                _typingTimer1.Tick += new EventHandler(this.handleTypingTimerTimeout);
+            }
+            _typingTimer1.Stop(); // Resets the timer
+            _typingTimer1.Tag = (sender as TextBox).Text; // This should be done with EventArgs
+            _typingTimer1.Start();
+
+            /*if (Waist2Measurement.Text.Length > 5)
             {
                 string rounded = Waist2Measurement.Text.Substring(0, 5);
                 arrayMeasurements[2, 0] = "WA";
                 arrayMeasurements[2, 1] = rounded;
                 updateH2Text(rounded.ToString());
                 Keyboard.Focus(Waist1Measurement);
-            }
+            }*/
         }
 
         

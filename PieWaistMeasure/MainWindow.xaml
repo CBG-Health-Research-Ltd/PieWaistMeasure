@@ -13,8 +13,8 @@
         <TextBlock x:Name="textBlock2" HorizontalAlignment="Left" Margin="125,280,0,0" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="20" Width="89"><Run Text="WA1"/><Run Text=":"/></TextBlock>
         <TextBlock x:Name="textBlock3" HorizontalAlignment="Left" Margin="125,403,0,0" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="20"><Run Text="WA2"/><Run Text=":"/></TextBlock>
         <Button x:Name="button" Content="Done Measuring" Margin="170,517,252.8,0" VerticalAlignment="Top" FontSize="20" Click="button_Click" Height="39"/>
-        <TextBox x:Name="Waist1Measurement" HorizontalAlignment="Left" Margin="257,278,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="20" Width="98" TextChanged="H1Measurement_TextChanged"/>
-        <TextBox x:Name="Waist2Measurement" HorizontalAlignment="Left" Margin="257,403,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="20" Width="98" TextChanged="H2Measurement_TextChanged"/>
+        <TextBox x:Name="Waist1Measurement" MaxLength="5" HorizontalAlignment="Left" Margin="257,278,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="20" Width="98" TextChanged="Waist1Measurement_TextChanged"/>
+        <TextBox x:Name="Waist2Measurement" MaxLength="5" HorizontalAlignment="Left" Margin="257,403,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="20" Width="98" TextChanged="Waist2Measurement_TextChanged"/>
         <TextBlock x:Name="Connectionstatus" HorizontalAlignment="Left" Margin="317,161,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="Disconnected" FontSize="20"/>
         <TextBlock x:Name="textBlock4" HorizontalAlignment="Left" Margin="371,280,0,0" TextWrapping="Wrap" Text="cm" VerticalAlignment="Top" FontSize="16"/>
         <TextBlock x:Name="textBlock4_Copy" HorizontalAlignment="Left" Margin="371,407,0,0" TextWrapping="Wrap" Text="cm" VerticalAlignment="Top" FontSize="16"/>
