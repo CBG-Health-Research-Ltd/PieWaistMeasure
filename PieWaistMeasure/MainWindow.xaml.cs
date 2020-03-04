@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -31,9 +32,11 @@ namespace PieWaistMeasure
     {
         System.Windows.Threading.DispatcherTimer _typingTimer;
         System.Windows.Threading.DispatcherTimer _typingTimer1;
+        System.Windows.Threading.DispatcherTimer _typingTimer2;
         public MainWindow()
         {
             InitializeComponent();
+            initialiseSurveyorInfo();
             try
             {
                 
@@ -89,32 +92,84 @@ namespace PieWaistMeasure
 
         private void button_Click(object sender, RoutedEventArgs e)
         {
+            decimal measurement1;
+            decimal measurement2;
             //CSV conversion must go here with appropriate handling. Currently checking for decimal point at string position 2
             try
             {
+                //bool notEmpty = String.IsNullOrEmpty(arrayMeasurements[1, 1].Substring(0, 2));
+                //bool notEmpty1 = String.IsNullOrEmpty(arrayMeasurements[2, 1].Substring(0, 2));
                 //Update to accomodate PIE format. Conversions might be neccessary
-                if (arrayMeasurements[0, 1].Substring(0, 2).Contains(".") && arrayMeasurements[1, 1].Substring(0, 2).Contains("."))
+               
+                if ((arrayMeasurements[1, 1][2] == '.' && arrayMeasurements[2, 1][2] == '.') || (arrayMeasurements[1, 1][3] == '.' && arrayMeasurements[2, 1][3] == '.'))
                 {
-                    string csv = ArrayToCsv(arrayMeasurements);
-                    WriteCSVFile(csv);
-                    WindowControl DistoTransfer = new WindowControl();
-                    DistoTransfer.AppName = "DistoTransfer";
-                    DistoTransfer.Close();
-                    Application.Current.Shutdown();
+                    measurement1 = ConvertStrToDec(arrayMeasurements[1, 1]);
+                    measurement2 = ConvertStrToDec(arrayMeasurements[2, 1]);
+                    if (CheckGreaterOnePercentDiff(measurement1, measurement2) == false)//Checking that there is a less than 1% difference between two measurements
+                    {
+                        string csv = ArrayToCsv(arrayMeasurements);
+                        WriteCSVFile(csv);
+                        Application.Current.Shutdown();
+                    }
+                    else //There is a greater than 1% difference, therefore get a 3rd measurement by enabling third measurement box.
+                    {
+                        //Disable first two measurement boxes. Enable third measurement box, shift focus to third measurement, disable Done measuring Box, 
+                        //enable submit final measurements.
+                        Waist1Measurement.IsEnabled = false;
+                        Waist2Measurement.IsEnabled = false;
+                        button.IsEnabled = false;
+                        button.Visibility = Visibility.Hidden;
+                        textBlock6.Visibility = Visibility.Visible;
+                        textBlock5.Visibility = Visibility.Visible;
+                        textBlock8.Visibility = Visibility.Visible;
+                        Waist3Measurement.Visibility = Visibility.Visible;
+                        button1.Visibility = Visibility.Visible;
+                        textBlock7.Visibility = Visibility.Visible;
+                        Waist3Measurement.IsEnabled = true;
+                        Waist3Measurement.Focus();
+                    }
                 }
                 else
                 {
-                    MessageBox.Show("Incorrect height format. \n\n Please ensure you've collected results using Bluetooth waist measure");
+                    MessageBox.Show("Incorrect waist measurement format. \n\n Please ensure you've collected results using Bluetooth waist measure.\n\n" +
+                        "If entering manually, 1 decimal place is expected.\nFor Example 70 cm must be input as 70.0");
                 }
             }
             catch
             {
-                MessageBox.Show("Please enter some measurements");
+                MessageBox.Show("Please enter some measurements.\n\nEnsure your measurements are equal.\n\n You may replace a measurement by clearing it and trying again.\n\n" +
+                    "If entering manually, 1 decimal place is expected.\nFor Example 70 cm must be input as 70.0");
             }
 
         }
 
 
+        private void button1_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                //bool notEmpty = String.IsNullOrEmpty(arrayMeasurements[1, 1].Substring(0, 2));
+                //bool notEmpty1 = String.IsNullOrEmpty(arrayMeasurements[2, 1].Substring(0, 2));
+                //Update to accomodate PIE format. Conversions might be neccessary
+
+                if ((arrayMeasurements[3, 1][2] == '.' )|| (arrayMeasurements[3, 1][3] == '.'))
+                {
+                    string csv = ArrayToCsv(arrayMeasurements);
+                    WriteCSVFile(csv);
+                    Application.Current.Shutdown();
+                }
+                else
+                {
+                    MessageBox.Show("Incorrect waist measurement format. \n\n Please ensure you've collected results using Bluetooth waist measure.\n\n" +
+                        "If entering manually, 1 decimal place is expected.\nFor Example 70 cm must be input as 70.0");
+                }
+            }
+            catch
+            {
+                MessageBox.Show("Please enter some measurements.\n\nEnsure your measurements are equal.\n\n You may replace a measurement by clearing it and trying again.\n\n" +
+                    "If entering manually, 1 decimal place is expected.\nFor Example 70 cm must be input as 70.0");
+            }
+        }
 
         public void updateConnectionStatus(string text)
         {
@@ -318,7 +373,7 @@ namespace PieWaistMeasure
         }
 
 
-        string[,] arrayMeasurements = new string[3, 6];
+        string[,] arrayMeasurements = new string[4, 6];
         private void initialiseSurveyorInfo()
         {
             arrayMeasurements[0, 0] = "MeasureType";
@@ -336,6 +391,10 @@ namespace PieWaistMeasure
             arrayMeasurements[2, 3] = respondentInfo[1];
             arrayMeasurements[2, 4] = respondentInfo[2];
             arrayMeasurements[2, 5] = respondentInfo[3];
+            arrayMeasurements[3, 2] = respondentInfo[0];
+            arrayMeasurements[3, 3] = respondentInfo[1];
+            arrayMeasurements[3, 4] = respondentInfo[2];
+            arrayMeasurements[3, 5] = respondentInfo[3];
 
 
         }
@@ -366,22 +425,38 @@ namespace PieWaistMeasure
             {
                 arrayMeasurements[2, 0] = "WA";
                 arrayMeasurements[2, 1] = Waist2Measurement.Text;
-                Keyboard.Focus(Waist1Measurement);
+                //Keyboard.Focus(Waist1Measurement);
             }
-
-
+            else if(waist1orwaist2 == "waist3")
+            {
+                arrayMeasurements[3, 0] = "WA";
+                arrayMeasurements[3, 1] = Waist3Measurement.Text;
+            }
 
             // The timer must be stopped! We want to act only once per keystroke.
             timer.Stop();
             _typingTimer = null;
             _typingTimer1 = null;
-            
+            _typingTimer2 = null;
+
+
         }
 
         string waist1orwaist2 = null;
+        string previousInput = "";
         private void Waist1Measurement_TextChanged(object sender, TextChangedEventArgs e)
         {
-            if (_typingTimer == null)
+            Regex r = new Regex("^-{0,1}\\d+\\.{0,1}\\d*$"); // This is the main part, can be altered to match any desired form or limitations
+            Match m = r.Match(Waist1Measurement.Text);
+            if (m.Success)
+            {
+                previousInput = Waist1Measurement.Text;
+            }
+            else
+            {
+                Waist1Measurement.Text = previousInput;
+            }
+            if (_typingTimer == null)//Only use these functions for PIE input, for manual input user will have to toggle to second box. Bool manual == false else do nothing
             {
                 _typingTimer = new DispatcherTimer();
                 _typingTimer.Interval = TimeSpan.FromMilliseconds(2000);
@@ -392,23 +467,22 @@ namespace PieWaistMeasure
             _typingTimer.Tag = (sender as TextBox).Text; // This should be done with EventArgs
             _typingTimer.Start();
 
-
-
-
-            /*if (Waist1Measurement.Text.Length > 5)
-            {
-                string rounded = Waist1Measurement.Text.Substring(0, 5);
-                arrayMeasurements[1, 0] = "WA";
-                arrayMeasurements[1, 1] = rounded;
-                updateH1Text(rounded.ToString());
-                Keyboard.Focus(Waist2Measurement);
-            }*/
-
         }
 
+        string previousInput1 = "";
         private void Waist2Measurement_TextChanged(object sender, TextChangedEventArgs e)
         {
-            if (_typingTimer1 == null)
+            Regex r = new Regex("^-{0,1}\\d+\\.{0,1}\\d*$"); // This is the main part, can be altered to match any desired form or limitations
+            Match m = r.Match(Waist2Measurement.Text);
+            if (m.Success)
+            {
+                previousInput1 = Waist2Measurement.Text;
+            }
+            else
+            {
+                Waist2Measurement.Text = previousInput1;
+            }
+            if (_typingTimer1 == null)//Only use these functions for PIE input, for manual input user will have to toggle to second box. Bool manual == false else do nothing
             {
                 _typingTimer1 = new DispatcherTimer();
                 _typingTimer1.Interval = TimeSpan.FromMilliseconds(2000);
@@ -419,17 +493,33 @@ namespace PieWaistMeasure
             _typingTimer1.Tag = (sender as TextBox).Text; // This should be done with EventArgs
             _typingTimer1.Start();
 
-            /*if (Waist2Measurement.Text.Length > 5)
-            {
-                string rounded = Waist2Measurement.Text.Substring(0, 5);
-                arrayMeasurements[2, 0] = "WA";
-                arrayMeasurements[2, 1] = rounded;
-                updateH2Text(rounded.ToString());
-                Keyboard.Focus(Waist1Measurement);
-            }*/
         }
 
-        
+        string previousInput2 = "";
+        private void Waist3Measurement_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            Regex r = new Regex("^-{0,1}\\d+\\.{0,1}\\d*$"); // This is the main part, can be altered to match any desired form or limitations
+            Match m = r.Match(Waist3Measurement.Text);
+            if (m.Success)
+            {
+                previousInput2 = Waist3Measurement.Text;
+            }
+            else
+            {
+                Waist3Measurement.Text = previousInput2;
+            }
+            if (_typingTimer2 == null)//Only use these functions for PIE input, for manual input user will have to toggle to second box. Bool manual == false else do nothing
+            {
+                _typingTimer2 = new DispatcherTimer();
+                _typingTimer2.Interval = TimeSpan.FromMilliseconds(2000);
+                waist1orwaist2 = "waist3";
+                _typingTimer2.Tick += new EventHandler(this.handleTypingTimerTimeout);
+            }
+            _typingTimer2.Stop(); // Resets the timer
+            _typingTimer2.Tag = (sender as TextBox).Text; // This should be done with EventArgs
+            _typingTimer2.Start();
+        }
+
 
         static string ArrayToCsv(string[,] values)
         {
@@ -463,8 +553,44 @@ namespace PieWaistMeasure
             string CSVFileName = @"C:\BodyMeasurements\WaistMeasurements\" + "WaistMeasurements_" + DateTime.Now.ToString("yyyy-MM-ddTHH-mm-ss") + ".csv";
 
             System.IO.File.WriteAllText(CSVFileName, csvMeasurements);
+        }
 
+        private decimal ConvertStrToDec(string value)
+        {
+            decimal convert = Convert.ToDecimal(value);
+            return convert;
+        }
 
+        private bool CheckGreaterOnePercentDiff(decimal value1, decimal value2)
+        {
+            if (value1 > value2)
+            {
+                decimal percent = ((value1 / value2) * 100);
+                if (percent > 101)
+                {
+                    return true; //true indicating that there is a higher than 1% difference
+                }
+                else
+                {
+                    return false; //false indicating that the difference is within 1%
+                }
+            }
+            else if (value2 > value1)
+            {
+                decimal percent = ((value2 / value1) * 100);
+                if (percent > 101)
+                {
+                    return true; //true indicating that there is a higher than 1% difference
+                }
+                else
+                {
+                    return false; //false indicating that the difference is within 1%
+                }
+            }
+            else
+            {
+                return false; // All other cases false as value1 and value2 will be equal
+            }
         }
 
         public class WindowControl
@@ -522,5 +648,6 @@ namespace PieWaistMeasure
             }
 
         }
+
     }
 }
