@@ -7,18 +7,18 @@
         mc:Ignorable="d"
     Title="MainWindow" Height="741.2" Width="515">
     <Grid Margin="0,10,-82,0" Height="725" VerticalAlignment="Top">
-        <TextBlock x:Name="AppTitle" HorizontalAlignment="Left" Margin="32,29,0,635" Text="PIE Waist Measurement" TextWrapping="Wrap" Width="429" FontSize="32" TextAlignment="Center"/>
-        <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="96,95,0,0" Text="Please turn on the PIE device to connect Bluetooth" TextWrapping="Wrap" VerticalAlignment="Top" Width="323" FontSize="14" Height="30"/>
-        <TextBlock x:Name="textBlock1" HorizontalAlignment="Left" Margin="53,135,0,0" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="24" Height="42" Width="206"><Run Text="Connection Status"/><Run Text=":"/><LineBreak/><Run/></TextBlock>
-        <TextBlock x:Name="textBlock2" HorizontalAlignment="Left" Margin="125,220,0,0" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="20" Width="89"><Run Text="WA1"/><Run Text=":"/></TextBlock>
-        <TextBlock x:Name="textBlock3" HorizontalAlignment="Left" Margin="125,295,0,0" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="20"><Run Text="WA2"/><Run Text=":"/></TextBlock>
+        <TextBlock x:Name="AppTitle" HorizontalAlignment="Left" Margin="32,29,0,635" Text="Waist Measurement" TextWrapping="Wrap" Width="429" FontSize="32" TextAlignment="Center"/>
+        <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="62,95,0,0" Text="Please turn on the PIE device to connect Bluetooth" TextWrapping="Wrap" VerticalAlignment="Top" Width="371" FontSize="16" Height="30"/>
+        <TextBlock x:Name="textBlock1" HorizontalAlignment="Left" Margin="82,130,0,0" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="18" Height="28" Width="161"><Run Text="Connection Status"/><Run Text=":"/><LineBreak/><Run/></TextBlock>
+        <TextBlock x:Name="textBlock2" HorizontalAlignment="Left" Margin="62,219,0,0" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="20" Width="161"><Run Text="1st Measurement"/><Run Text=":"/></TextBlock>
+        <TextBlock x:Name="textBlock3" HorizontalAlignment="Left" Margin="62,295,0,0" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="20"><Run Text="2nd Measurement"/><Run Text=":"/></TextBlock>
         <Button x:Name="button" Content="Done Measuring" Margin="188,512,235.8,0" VerticalAlignment="Top" FontSize="20" Click="button_Click" Height="39"/>
         <TextBox x:Name="Waist1Measurement" MaxLength="5" HorizontalAlignment="Left" Margin="257,219,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="20" Width="98" TextChanged="Waist1Measurement_TextChanged"/>
         <TextBox x:Name="Waist2Measurement" MaxLength="5" HorizontalAlignment="Left" Margin="257,293,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="20" Width="98" TextChanged="Waist2Measurement_TextChanged"/>
-        <TextBlock x:Name="Connectionstatus" HorizontalAlignment="Left" Margin="313,139,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="Disconnected" FontSize="20"/>
+        <TextBlock x:Name="Connectionstatus" HorizontalAlignment="Left" Margin="284,130,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="Disconnected" FontSize="18"/>
         <TextBlock x:Name="textBlock4" HorizontalAlignment="Left" Margin="371,224,0,0" TextWrapping="Wrap" Text="cm" VerticalAlignment="Top" FontSize="16"/>
         <TextBlock x:Name="textBlock5" HorizontalAlignment="Left" Margin="371,299,0,0" TextWrapping="Wrap" Text="cm" VerticalAlignment="Top" FontSize="16"/>
-        <TextBlock x:Name="textBlock6" HorizontalAlignment="Left" Margin="125,441,0,0" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="20" Visibility="Hidden"><Run Text="WA"/><Run Text="3"/><Run Text=":"/></TextBlock>
+        <TextBlock x:Name="textBlock6" HorizontalAlignment="Left" Margin="66,441,0,0" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="20" Visibility="Hidden"><Run Text="3rd Measurement"/><Run Text=""/><Run Text=":"/></TextBlock>
         <TextBox x:Name="Waist3Measurement" MaxLength="5" HorizontalAlignment="Left" Margin="257,439,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="20" Width="98"  Visibility="Hidden" TextChanged="Waist3Measurement_TextChanged"/>
         <TextBlock x:Name="textBlock7" HorizontalAlignment="Left" Margin="371,445,0,0" TextWrapping="Wrap" Text="cm" VerticalAlignment="Top" FontSize="16" Visibility="Hidden"/>
         <TextBlock x:Name="textBlock8" HorizontalAlignment="Left" Margin="96,365,0,0" Text="Alert surveyor that the difference of measurments is greater tan 1%, therefore retake measurement."  Visibility="Hidden" TextWrapping="Wrap" VerticalAlignment="Top" Width="323" FontSize="14" Height="50"/>
