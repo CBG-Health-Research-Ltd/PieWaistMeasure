@@ -123,6 +123,7 @@ namespace PieWaistMeasure
                         textBlock5.Visibility = Visibility.Visible;
                         textBlock8.Visibility = Visibility.Visible;
                         Waist3Measurement.Visibility = Visibility.Visible;
+                        clear3.Visibility = Visibility.Visible;
                         button1.Visibility = Visibility.Visible;
                         textBlock7.Visibility = Visibility.Visible;
                         Waist3Measurement.IsEnabled = true;
@@ -169,6 +170,155 @@ namespace PieWaistMeasure
                 MessageBox.Show("Please enter some measurements.\n\nEnsure your measurements are equal.\n\n You may replace a measurement by clearing it and trying again.\n\n" +
                     "If entering manually, 1 decimal place is expected.\nFor Example 70 cm must be input as 70.0");
             }
+        }
+
+        //Button handles any manual measurement cases. Only enabled and vidible for manual measurements. Checks all values in text box and adds to measurement.
+        private void button3_Click(object sender, RoutedEventArgs e)
+        {
+            //In the case of button3 click, manualmeasurement == true. So all existing string input must be converted to decimal and added appropriately to arrayMeasurements.
+            //Once added to arrayMeasurements, run the necessary checks in the exact same manner that BT measurements are checked. If greater than 1% diff then button4
+            //must be enabled which allows submission of third manual measurement. Button3 and Button4 must be disabled upon manualMeasurement unchecked i.e. manualmeasurement == false
+            decimal measurement1;
+            decimal measurement2;
+
+            try
+            {
+                //Set arrayMeasurements to equal what surveyor has put manually into text fields.
+                arrayMeasurements[1, 0] = "WA";
+                arrayMeasurements[1, 1] = Waist1Measurement.Text;
+                arrayMeasurements[2, 0] = "WA";
+                arrayMeasurements[2, 1] = Waist2Measurement.Text;
+
+                //Checking for decimal point for all weight possibilities. Using same verification as BT measurement.
+                if ((arrayMeasurements[1, 1][2] == '.' && arrayMeasurements[2, 1][2] == '.') || (arrayMeasurements[1, 1][3] == '.' && arrayMeasurements[2, 1][3] == '.'))
+                {
+                    measurement1 = ConvertStrToDec(arrayMeasurements[1, 1]);
+                    measurement2 = ConvertStrToDec(arrayMeasurements[2, 1]);
+                    if (CheckGreaterOnePercentDiff(measurement1, measurement2) == false)//Checking that there is a less than 1% difference between two measurements
+                    {
+                        string csv = ArrayToCsv(arrayMeasurements);
+                        WriteCSVFile(csv);
+                        Application.Current.Shutdown();
+                    }
+                    else
+                    {
+                        //Disable first two measurement boxes. Enable third measurement box, shift focus to third measurement, disable Done measuring Box, 
+                        //enable submit final measurements.
+                        Waist1Measurement.IsEnabled = false;
+                        Waist2Measurement.IsEnabled = false;
+                        button.IsEnabled = false;
+                        button.Visibility = Visibility.Hidden;
+                        button1.IsEnabled = false;
+                        button1.Visibility = Visibility.Hidden;
+                        button3.IsEnabled = false;
+                        button3.Visibility = Visibility.Hidden;
+                        textBlock6.Visibility = Visibility.Visible;
+                        textBlock5.Visibility = Visibility.Visible;
+                        textBlock8.Visibility = Visibility.Visible;
+                        Waist3Measurement.Visibility = Visibility.Visible;
+                        clear3.Visibility = Visibility.Visible;
+                        button4.Visibility = Visibility.Visible;
+                        button4.IsEnabled = true;
+                        textBlock7.Visibility = Visibility.Visible;
+                        Waist3Measurement.IsEnabled = true;
+                        Waist3Measurement.Focus();
+                    }
+
+                }
+                else
+                {
+                    MessageBox.Show("Incorrect waist measurement format. \n\n Please ensure you've collected results using Bluetooth waist measure.\n\n" +
+                        "If entering manually, 1 decimal place is expected.\nFor Example 70 cm must be input as 70.0");
+                }
+            }
+            catch
+            {   //array indexing exception, user has entered either no data or some invalid data.
+                MessageBox.Show("Please enter some measurements.\n\nEnsure your measurements are equal.\n\n You may replace a measurement by clearing it and trying again.\n\n" +
+                    "If entering manually, 1 decimal place is expected.\nFor Example 70 cm must be input as 70.0");
+            }
+        }
+
+
+        private void button4_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        bool manualMeasurement = false;
+        bool regexOverride = false;//allows usage of text box clear operations to delte old results by not having regex applied to user input
+        private void checkBox_Checked(object sender, RoutedEventArgs e)
+        {
+            regexOverride = true;
+            manualMeasurement = true;
+            Application.Current.Dispatcher.Invoke(() => { Waist1Measurement.Clear(); Waist2Measurement.Clear(); Waist3Measurement.Clear(); });
+            MessageBox.Show("You are now entering measurements manually.\n\n" +
+                "Please ensure measurements are of 1 decimal place format\n\n" +
+                "For example, 80 cm should be inout as 80.0\n" +
+                "140 cm should be input as 140.0");
+            //////
+            RunCleanUp();
+            Waist1Measurement.Focus();
+            ///////
+            regexOverride = false;
+
+        }
+
+        private void checkBox_Unchecked(object sender, RoutedEventArgs e)
+        {
+            regexOverride = true;
+            manualMeasurement = false;
+            Application.Current.Dispatcher.Invoke(() => { Waist1Measurement.Clear(); Waist2Measurement.Clear(); Waist3Measurement.Clear(); });
+            MessageBox.Show("You are now entering measurements with Bluetooth.");
+            //////
+            RunCleanUp();
+            Waist1Measurement.Focus();
+            ////////
+            regexOverride = false;
+        }
+
+        //Clears everything in the case of switching between manual input and bluetooth measurements.
+        public void RunCleanUp()
+        {
+            //reset all measruements
+            arrayMeasurements[1, 1] = null;
+            arrayMeasurements[2, 1] = null;
+            arrayMeasurements[3, 1] = null;
+
+            //enable first 2 measurement fields
+            Waist1Measurement.IsEnabled = true;
+            Waist2Measurement.IsEnabled = true;
+
+            if (manualMeasurement == true) //Enable the manualMeasurement == true button to perform submission calcs using the manually entered measurements and not timer entered measurements.
+            {
+                button.IsEnabled = false;
+                button.Visibility = Visibility.Hidden;
+                button3.IsEnabled = true;
+                button3.Visibility = Visibility.Visible;
+            }
+            else //Bluetooth measuring so setting initial button again.
+            {
+                button.IsEnabled = true;
+                button.Visibility = Visibility.Visible;
+                button3.IsEnabled = false;
+                button3.Visibility = Visibility.Hidden;
+            }
+
+            //clear visibility of all things related to taking the third measurement
+            textBlock6.Visibility = Visibility.Hidden;
+            Waist3Measurement.Visibility = Visibility.Hidden;
+            button1.Visibility = Visibility.Hidden;
+            textBlock7.Visibility = Visibility.Hidden;
+            textBlock8.Visibility = Visibility.Hidden;
+            clear3.Visibility = Visibility.Hidden;          
+            Waist3Measurement.IsEnabled = false;
+
+            //Set focus to first measurement again
+            Waist1Measurement.Focus();
+
+            //Previous input used in Regex expressions for only allowing certain char input. Clearing these avoids duplication of previous inout values.
+            previousInput = "";
+            previousInput1 = "";
+            previousInput2 = "";
         }
 
         public void updateConnectionStatus(string text)
@@ -453,78 +603,96 @@ namespace PieWaistMeasure
         string previousInput = "";
         private void Waist1Measurement_TextChanged(object sender, TextChangedEventArgs e)
         {
-            Regex r = new Regex("^-{0,1}\\d+\\.{0,1}\\d*$"); // This is the main part, can be altered to match any desired form or limitations
-            Match m = r.Match(Waist1Measurement.Text);
-            if (m.Success)
+            if (regexOverride == false)
             {
-                previousInput = Waist1Measurement.Text;
+                Regex r = new Regex("^-{0,1}\\d+\\.{0,1}\\d*$"); // This is the main part, can be altered to match any desired form or limitations
+                Match m = r.Match(Waist1Measurement.Text);
+                if (m.Success)
+                {
+                    previousInput = Waist1Measurement.Text;
+                }
+                else
+                {
+                    Waist1Measurement.Text = previousInput;
+                }
             }
-            else
+            if (manualMeasurement == false)
             {
-                Waist1Measurement.Text = previousInput;
+                if (_typingTimer == null)//Only use these functions for PIE input, for manual input user will have to toggle to second box. Bool manual == false else do nothing
+                {
+                    _typingTimer = new DispatcherTimer();
+                    _typingTimer.Interval = TimeSpan.FromMilliseconds(2000);
+                    waist1orwaist2 = "waist1";
+                    _typingTimer.Tick += new EventHandler(this.handleTypingTimerTimeout);
+                }
+                _typingTimer.Stop(); // Resets the timer
+                _typingTimer.Tag = (sender as TextBox).Text; // This should be done with EventArgs
+                _typingTimer.Start();
             }
-            if (_typingTimer == null)//Only use these functions for PIE input, for manual input user will have to toggle to second box. Bool manual == false else do nothing
-            {
-                _typingTimer = new DispatcherTimer();
-                _typingTimer.Interval = TimeSpan.FromMilliseconds(2000);
-                waist1orwaist2 = "waist1";
-                _typingTimer.Tick += new EventHandler(this.handleTypingTimerTimeout);
-            }
-            _typingTimer.Stop(); // Resets the timer
-            _typingTimer.Tag = (sender as TextBox).Text; // This should be done with EventArgs
-            _typingTimer.Start();
 
         }
 
         string previousInput1 = "";
         private void Waist2Measurement_TextChanged(object sender, TextChangedEventArgs e)
         {
-            Regex r = new Regex("^-{0,1}\\d+\\.{0,1}\\d*$"); // This is the main part, can be altered to match any desired form or limitations
-            Match m = r.Match(Waist2Measurement.Text);
-            if (m.Success)
+            if (regexOverride == false)
             {
-                previousInput1 = Waist2Measurement.Text;
+                Regex r = new Regex("^-{0,1}\\d+\\.{0,1}\\d*$"); // This is the main part, can be altered to match any desired form or limitations
+                Match m = r.Match(Waist2Measurement.Text);
+                if (m.Success)
+                {
+                    previousInput1 = Waist2Measurement.Text;
+                }
+                else
+                {
+                    Waist2Measurement.Text = previousInput1;
+                }
             }
-            else
+            if (manualMeasurement == false)
             {
-                Waist2Measurement.Text = previousInput1;
+                if (_typingTimer1 == null)//Only use these functions for PIE input, for manual input user will have to toggle to second box. Bool manual == false else do nothing
+                {
+                    _typingTimer1 = new DispatcherTimer();
+                    _typingTimer1.Interval = TimeSpan.FromMilliseconds(2000);
+                    waist1orwaist2 = "waist2";
+                    _typingTimer1.Tick += new EventHandler(this.handleTypingTimerTimeout);
+                }
+                _typingTimer1.Stop(); // Resets the timer
+                _typingTimer1.Tag = (sender as TextBox).Text; // This should be done with EventArgs
+                _typingTimer1.Start();
             }
-            if (_typingTimer1 == null)//Only use these functions for PIE input, for manual input user will have to toggle to second box. Bool manual == false else do nothing
-            {
-                _typingTimer1 = new DispatcherTimer();
-                _typingTimer1.Interval = TimeSpan.FromMilliseconds(2000);
-                waist1orwaist2 = "waist2";
-                _typingTimer1.Tick += new EventHandler(this.handleTypingTimerTimeout);
-            }
-            _typingTimer1.Stop(); // Resets the timer
-            _typingTimer1.Tag = (sender as TextBox).Text; // This should be done with EventArgs
-            _typingTimer1.Start();
 
         }
 
         string previousInput2 = "";
         private void Waist3Measurement_TextChanged(object sender, TextChangedEventArgs e)
         {
-            Regex r = new Regex("^-{0,1}\\d+\\.{0,1}\\d*$"); // This is the main part, can be altered to match any desired form or limitations
-            Match m = r.Match(Waist3Measurement.Text);
-            if (m.Success)
+            if (regexOverride == false)
             {
-                previousInput2 = Waist3Measurement.Text;
+                Regex r = new Regex("^-{0,1}\\d+\\.{0,1}\\d*$"); // This is the main part, can be altered to match any desired form or limitations
+                Match m = r.Match(Waist3Measurement.Text);
+                if (m.Success)
+                {
+                    previousInput2 = Waist3Measurement.Text;
+                }
+                else
+                {
+                    Waist3Measurement.Text = previousInput2;
+                }
             }
-            else
+            if (manualMeasurement == false)
             {
-                Waist3Measurement.Text = previousInput2;
+                if (_typingTimer2 == null)//Only use these functions for PIE input, for manual input user will have to toggle to second box. Bool manual == false else do nothing
+                {
+                    _typingTimer2 = new DispatcherTimer();
+                    _typingTimer2.Interval = TimeSpan.FromMilliseconds(2000);
+                    waist1orwaist2 = "waist3";
+                    _typingTimer2.Tick += new EventHandler(this.handleTypingTimerTimeout);
+                }
+                _typingTimer2.Stop(); // Resets the timer
+                _typingTimer2.Tag = (sender as TextBox).Text; // This should be done with EventArgs
+                _typingTimer2.Start();
             }
-            if (_typingTimer2 == null)//Only use these functions for PIE input, for manual input user will have to toggle to second box. Bool manual == false else do nothing
-            {
-                _typingTimer2 = new DispatcherTimer();
-                _typingTimer2.Interval = TimeSpan.FromMilliseconds(2000);
-                waist1orwaist2 = "waist3";
-                _typingTimer2.Tick += new EventHandler(this.handleTypingTimerTimeout);
-            }
-            _typingTimer2.Stop(); // Resets the timer
-            _typingTimer2.Tag = (sender as TextBox).Text; // This should be done with EventArgs
-            _typingTimer2.Start();
         }
 
 

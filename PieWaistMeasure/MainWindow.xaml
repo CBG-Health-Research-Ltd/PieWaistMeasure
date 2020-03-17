@@ -7,7 +7,7 @@
         mc:Ignorable="d"
     Title="MainWindow" Height="741.2" Width="515">
     <Grid Margin="0,10,-82,0" Height="725" VerticalAlignment="Top">
-        <TextBlock x:Name="AppTitle" HorizontalAlignment="Left" Margin="32,29,0,635" Text="Waist Measurement" TextWrapping="Wrap" Width="429" FontSize="32" TextAlignment="Center"/>
+        <TextBlock x:Name="AppTitle" HorizontalAlignment="Left" Margin="32,29,0,635" Text="Waist Measurement" TextWrapping="Wrap" Width="429" FontSize="32" TextAlignment="Center" Foreground="#FF4949A9"/>
         <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="62,95,0,0" Text="Please turn on the PIE device to connect Bluetooth" TextWrapping="Wrap" VerticalAlignment="Top" Width="371" FontSize="16" Height="30"/>
         <TextBlock x:Name="textBlock1" HorizontalAlignment="Left" Margin="82,130,0,0" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="18" Height="28" Width="161"><Run Text="Connection Status"/><Run Text=":"/><LineBreak/><Run/></TextBlock>
         <TextBlock x:Name="textBlock2" HorizontalAlignment="Left" Margin="62,219,0,0" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="20" Width="161"><Run Text="1st Measurement"/><Run Text=":"/></TextBlock>
@@ -23,5 +23,11 @@
         <TextBlock x:Name="textBlock7" HorizontalAlignment="Left" Margin="371,445,0,0" TextWrapping="Wrap" Text="cm" VerticalAlignment="Top" FontSize="16" Visibility="Hidden"/>
         <TextBlock x:Name="textBlock8" HorizontalAlignment="Left" Margin="96,365,0,0" Text="Alert surveyor that the difference of measurments is greater tan 1%, therefore retake measurement."  Visibility="Hidden" TextWrapping="Wrap" VerticalAlignment="Top" Width="323" FontSize="14" Height="50"/>
         <Button x:Name="button1" Content="Done Measuring" Margin="189,512,235.8,0" VerticalAlignment="Top" FontSize="20" Click="button1_Click" Height="39" Visibility="Hidden"/>
+        <CheckBox x:Name="checkBox" Content="Manual Measurement" HorizontalAlignment="Left" Margin="75,172,0,0" VerticalAlignment="Top" FontSize="14" Height="22" Width="168" Checked="checkBox_Checked" Unchecked="checkBox_Unchecked"/>
+        <Button x:Name="clear1" Content="X" HorizontalAlignment="Left" Margin="425,219,0,0" VerticalAlignment="Top" Width="23" FontSize="20" FontFamily="Lucida Console" Background="White" Foreground="#FFDD1B1B" BorderBrush="#FF0B0B0B"/>
+        <Button x:Name="clear2" Content="X" HorizontalAlignment="Left" Margin="425,295,0,0" VerticalAlignment="Top" Width="23" FontSize="20" FontFamily="Lucida Console" Background="White" Foreground="#FFDD1B1B" BorderBrush="#FF0B0B0B"/>
+        <Button x:Name="clear3" Content="X" HorizontalAlignment="Left" Margin="425,441,0,0" VerticalAlignment="Top" Width="23" FontSize="20" FontFamily="Lucida Console" Background="White" Foreground="#FFDD1B1B" Visibility="Hidden" BorderBrush="#FF0B0B0B" RenderTransformOrigin="0.435,-0.707"/>
+        <Button x:Name="button3" Content="Done Measuring" Margin="188,512,236.2,0" VerticalAlignment="Top" FontSize="20" Click="button3_Click" Visibility="Hidden" Height="39"/>
+        <Button x:Name="button4" Content="Done Measuring" Margin="188,512,236.2,0" VerticalAlignment="Top" FontSize="20" Click="button4_Click" Visibility="Hidden" Height="39"/>
     </Grid>
 </Window>
