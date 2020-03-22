@@ -90,6 +90,7 @@ namespace PieWaistMeasure
 
         }
 
+        //Button to submit Bluetooth collected results of first two measurement fields. Success determined by no 1% difference.
         private void button_Click(object sender, RoutedEventArgs e)
         {
             decimal measurement1;
@@ -101,10 +102,13 @@ namespace PieWaistMeasure
                 //bool notEmpty1 = String.IsNullOrEmpty(arrayMeasurements[2, 1].Substring(0, 2));
                 //Update to accomodate PIE format. Conversions might be neccessary
                
-                if ((arrayMeasurements[1, 1][2] == '.' && arrayMeasurements[2, 1][2] == '.') || (arrayMeasurements[1, 1][3] == '.' && arrayMeasurements[2, 1][3] == '.'))
+                if ((arrayMeasurements[1, 1][2] == '.' || arrayMeasurements[2, 1][2] == '.') || (arrayMeasurements[1, 1][3] == '.' || arrayMeasurements[2, 1][3] == '.'))
                 {
                     measurement1 = ConvertStrToDec(arrayMeasurements[1, 1]);
                     measurement2 = ConvertStrToDec(arrayMeasurements[2, 1]);
+                    arrayMeasurements[1, 6] = "BluetoothInput";
+                    arrayMeasurements[2, 6] = "BluetoothInput";
+
                     if (CheckGreaterOnePercentDiff(measurement1, measurement2) == false)//Checking that there is a less than 1% difference between two measurements
                     {
                         string csv = ArrayToCsv(arrayMeasurements);
@@ -144,7 +148,7 @@ namespace PieWaistMeasure
 
         }
 
-
+        //Button to submit third measurement, includes the already populated first two measurements after 1% margin check fails.
         private void button1_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -155,6 +159,7 @@ namespace PieWaistMeasure
 
                 if ((arrayMeasurements[3, 1][2] == '.' )|| (arrayMeasurements[3, 1][3] == '.'))
                 {
+                    arrayMeasurements[3, 6] = "BluetoothInput";
                     string csv = ArrayToCsv(arrayMeasurements);
                     WriteCSVFile(csv);
                     Application.Current.Shutdown();
@@ -172,7 +177,7 @@ namespace PieWaistMeasure
             }
         }
 
-        //Button handles any manual measurement cases. Only enabled and vidible for manual measurements. Checks all values in text box and adds to measurement.
+        //Button handles any manual measurement cases. Only enabled and visible for manual measurements. Checks all values in text box and adds to measurement.
         private void button3_Click(object sender, RoutedEventArgs e)
         {
             //In the case of button3 click, manualmeasurement == true. So all existing string input must be converted to decimal and added appropriately to arrayMeasurements.
@@ -183,11 +188,13 @@ namespace PieWaistMeasure
 
             try
             {
-                //Set arrayMeasurements to equal what surveyor has put manually into text fields.
+                //Set arrayMeasurements to equal what surveyor has put manually into text fields. Set Manual Input
                 arrayMeasurements[1, 0] = "WA";
                 arrayMeasurements[1, 1] = Waist1Measurement.Text;
                 arrayMeasurements[2, 0] = "WA";
                 arrayMeasurements[2, 1] = Waist2Measurement.Text;
+                arrayMeasurements[1, 6] = "ManualInput";
+                arrayMeasurements[2, 6] = "ManualInput";
 
                 //Checking for decimal point for all weight possibilities. Using same verification as BT measurement.
                 if ((arrayMeasurements[1, 1][2] == '.' && arrayMeasurements[2, 1][2] == '.') || (arrayMeasurements[1, 1][3] == '.' && arrayMeasurements[2, 1][3] == '.'))
@@ -241,7 +248,34 @@ namespace PieWaistMeasure
 
         private void button4_Click(object sender, RoutedEventArgs e)
         {
+            try
+            {
+                //bool notEmpty = String.IsNullOrEmpty(arrayMeasurements[1, 1].Substring(0, 2));
+                //bool notEmpty1 = String.IsNullOrEmpty(arrayMeasurements[2, 1].Substring(0, 2));
+                //Update to accomodate PIE format. Conversions might be neccessary
 
+                //Set measurements to be obtained from manual entry and set manual input type
+                arrayMeasurements[3, 0] = "WA";
+                arrayMeasurements[3, 1] = Waist3Measurement.Text;
+                arrayMeasurements[3, 6] = "ManualInput";
+
+                if ((arrayMeasurements[3, 1][2] == '.') || (arrayMeasurements[3, 1][3] == '.'))
+                {
+                    string csv = ArrayToCsv(arrayMeasurements);
+                    WriteCSVFile(csv);
+                    Application.Current.Shutdown();
+                }
+                else
+                {
+                    MessageBox.Show("Incorrect waist measurement format. \n\n Please ensure you've collected results using Bluetooth waist measure.\n\n" +
+                        "If entering manually, 1 decimal place is expected.\nFor Example 70 cm must be input as 70.0");
+                }
+            }
+            catch
+            {
+                MessageBox.Show("Please enter some measurements.\n\nEnsure your measurements are equal.\n\n You may replace a measurement by clearing it and trying again.\n\n" +
+                    "If entering manually, 1 decimal place is expected.\nFor Example 70 cm must be input as 70.0");
+            }
         }
 
         bool manualMeasurement = false;
@@ -283,6 +317,9 @@ namespace PieWaistMeasure
             arrayMeasurements[1, 1] = null;
             arrayMeasurements[2, 1] = null;
             arrayMeasurements[3, 1] = null;
+            arrayMeasurements[1, 6] = null;
+            arrayMeasurements[2, 6] = null;
+            arrayMeasurements[3, 6] = null;
 
             //enable first 2 measurement fields
             Waist1Measurement.IsEnabled = true;
@@ -321,6 +358,7 @@ namespace PieWaistMeasure
             previousInput2 = "";
         }
 
+        //Updating the connection status.
         public void updateConnectionStatus(string text)
         {
             if (text == "CONNECTED")
@@ -333,6 +371,7 @@ namespace PieWaistMeasure
             }
         }
 
+        //Text updates for potential rounding purposes
         public void updateH1Text(string text)
         {
             Application.Current.Dispatcher.Invoke(() => { Waist1Measurement.Text = text; });
@@ -343,6 +382,8 @@ namespace PieWaistMeasure
             Application.Current.Dispatcher.Invoke(() => { Waist2Measurement.Text = text; });
         }
 
+
+        //BleWatcher continuously polls devices on the BLE advertisement stack.
         private ObservableCollection<BluetoothLEDeviceDisplay> KnownDevices = new ObservableCollection<BluetoothLEDeviceDisplay>();
         private List<DeviceInformation> UnknownDevices = new List<DeviceInformation>();
 
@@ -381,6 +422,8 @@ namespace PieWaistMeasure
             // sample for an example.
             deviceWatcher.Start();
         }
+
+        //Any new BT device added to the observable list this is fired. Taken from microsoft BLE client open source and modified.
         private async void DeviceWatcher_Added(DeviceWatcher sender, DeviceInformation deviceInfo)
         {
             await Task.Run(async () =>
@@ -412,6 +455,7 @@ namespace PieWaistMeasure
 
         }
 
+        //Any new BT device updated in the observable list this is fired. Taken from microsoft BLE client open source and modified.
         private async void DeviceWatcher_Updated(DeviceWatcher sender, DeviceInformationUpdate deviceInfoUpdate)
         {
 
@@ -529,8 +573,8 @@ namespace PieWaistMeasure
             }
         }
 
-
-        string[,] arrayMeasurements = new string[4, 6];
+        //Initialising all fields to be used in final csv data save.
+        string[,] arrayMeasurements = new string[4, 7];
         private void initialiseSurveyorInfo()
         {
             arrayMeasurements[0, 0] = "MeasureType";
@@ -539,6 +583,7 @@ namespace PieWaistMeasure
             arrayMeasurements[0, 3] = "MB";
             arrayMeasurements[0, 4] = "HHID";
             arrayMeasurements[0, 5] = "RespondentID";
+            arrayMeasurements[0, 6] = "MeasurementInputType";
             string[] respondentInfo = GetRespondentIdentifiers();
             arrayMeasurements[1, 2] = respondentInfo[0];
             arrayMeasurements[1, 3] = respondentInfo[1];
@@ -556,13 +601,15 @@ namespace PieWaistMeasure
 
         }
 
+        //Retrieve SM generated identifiers from txt file
         private string[] GetRespondentIdentifiers()
         {
             string respIDs = File.ReadLines(@"C:\NZHS\surveyinstructions\MeasurementInfo.txt").First();
-            string[] respIDSplit = respIDs.Split('+');
+            string[] respIDSplit = respIDs.Split('+');//Split each field with '+' so txt file must be saved in that format
             return respIDSplit;
         }
 
+        //A timer is fired if input is done via BT. this event corresponds to timer interval for operations such as focus change and prompts to surveyor to reset measurement.
         private void handleTypingTimerTimeout(object sender, EventArgs e)
         {
             
@@ -599,6 +646,7 @@ namespace PieWaistMeasure
 
         }
 
+        //Only permit numbers and decimal points in fields and start timer to fire data logging if it is a BT input.
         string waist1orwaist2 = null;
         string previousInput = "";
         private void Waist1Measurement_TextChanged(object sender, TextChangedEventArgs e)
@@ -695,7 +743,7 @@ namespace PieWaistMeasure
             }
         }
 
-
+        //Stores any 2d array into a csv file
         static string ArrayToCsv(string[,] values)
         {
             // Get the bounds.
@@ -721,6 +769,7 @@ namespace PieWaistMeasure
             return sb.ToString();
         }
 
+        //Writes dynamic date csv file
         private void WriteCSVFile(string csvMeasurements)
         {
 
@@ -736,6 +785,7 @@ namespace PieWaistMeasure
             return convert;
         }
 
+        //Percentage check which is global for all BT mesurements.
         private bool CheckGreaterOnePercentDiff(decimal value1, decimal value2)
         {
             if (value1 > value2)
@@ -768,12 +818,9 @@ namespace PieWaistMeasure
             }
         }
 
+        //handle external windows with this class
         public class WindowControl
         {
-            //Set-up to declare which application we want to perform controls on. Vary for chrome and 
-            //LaptopShowcards minimisation.
-            //"chrome"
-            //"BluetoothTestClient"
             private string appName;  // the name field
             public string AppName    // the Name property
             {
