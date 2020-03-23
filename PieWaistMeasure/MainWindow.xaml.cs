@@ -623,6 +623,9 @@ namespace PieWaistMeasure
             {
                 arrayMeasurements[1, 0] = "WA";
                 arrayMeasurements[1, 1] = Waist1Measurement.Text;
+                MessageBox.Show("Please take 10 seconds to re-position yourself for re-taking measurement.\n\n" +
+                    "2nd measurement will be enabled after 10 seconds.");
+                Thread.Sleep(10000);
                 Keyboard.Focus(Waist2Measurement);
             }
             else if(waist1orwaist2 == "waist2")
