@@ -47,7 +47,7 @@ namespace PieWaistMeasure
             }
             catch
             {
-                MessageBox.Show("Could not find EXTERNAL service for Bluetooth transfer");
+                //Missing external service
             }
             //MonitorConnection();
             this.Topmost = true;
@@ -119,8 +119,13 @@ namespace PieWaistMeasure
                     {
                         //Disable first two measurement boxes. Enable third measurement box, shift focus to third measurement, disable Done measuring Box, 
                         //enable submit final measurements.
+                        MessageBox.Show("Third measurement required.\n\nPlease take 10 seconds to re-position yourself for re-taking measurement.\n\n" +
+                        "3rd measurement will be enabled after 10 seconds of closing this message.");
+                        Thread.Sleep(10000);
                         Waist1Measurement.IsEnabled = false;
                         Waist2Measurement.IsEnabled = false;
+                        clear1.IsEnabled = false;
+                        clear2.IsEnabled = false;
                         button.IsEnabled = false;
                         button.Visibility = Visibility.Hidden;
                         textBlock6.Visibility = Visibility.Visible;
@@ -211,6 +216,9 @@ namespace PieWaistMeasure
                     {
                         //Disable first two measurement boxes. Enable third measurement box, shift focus to third measurement, disable Done measuring Box, 
                         //enable submit final measurements.
+                        MessageBox.Show("Third measurement required.\n\nPlease take 10 seconds to re-position yourself for re-taking measurement.\n\n" +
+                        "3rd measurement will be enabled after 10 seconds.");
+                        Thread.Sleep(10000);
                         Waist1Measurement.IsEnabled = false;
                         Waist2Measurement.IsEnabled = false;
                         button.IsEnabled = false;
@@ -307,6 +315,31 @@ namespace PieWaistMeasure
             RunCleanUp();
             Waist1Measurement.Focus();
             ////////
+            regexOverride = false;
+        }
+
+        //Clearing measurements from individual fields
+        private void clear1_Click(object sender, RoutedEventArgs e)
+        {
+            regexOverride = true;
+            Application.Current.Dispatcher.Invoke(() => {Waist1Measurement.Clear();});
+            Waist1Measurement.Focus();
+            regexOverride = false;
+        }
+
+        private void clear2_Click(object sender, RoutedEventArgs e)
+        {
+            regexOverride = true;
+            Application.Current.Dispatcher.Invoke(() => { Waist2Measurement.Clear(); });
+            Waist2Measurement.Focus();
+            regexOverride = false;
+        }
+
+        private void clear3_Click(object sender, RoutedEventArgs e)
+        {
+            regexOverride = true;
+            Application.Current.Dispatcher.Invoke(() => { Waist3Measurement.Clear(); });
+            Waist3Measurement.Focus();
             regexOverride = false;
         }
 
