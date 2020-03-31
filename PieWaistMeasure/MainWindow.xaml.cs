@@ -30,9 +30,11 @@ namespace PieWaistMeasure
     /// </summary>
     public partial class MainWindow : Window
     {
+        //These timers allow for a 2 second interval to await waist measure BT input before focusing on next measurement field.
         System.Windows.Threading.DispatcherTimer _typingTimer;
         System.Windows.Threading.DispatcherTimer _typingTimer1;
         System.Windows.Threading.DispatcherTimer _typingTimer2;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -59,33 +61,9 @@ namespace PieWaistMeasure
 
         }
 
-        Process process = new Process();
-        void OpenLeicaService()
-        {
-
-            string fileName = @"C:\Program Files (x86)\DISTO transfer 60\DistoTransfer.exe";
-
-            process.StartInfo.Arguments = null;
-            process.StartInfo.CreateNoWindow = true;
-            process.StartInfo.WindowStyle = ProcessWindowStyle.Minimized;
-            process.StartInfo.FileName = fileName;
-            process.StartInfo.UseShellExecute = true;
-            process.Start();
-
-        }
-
-        private void MinimizeLeicaService()
-        {
-
-            WindowControl DistoTransfer = new WindowControl();
-            DistoTransfer.AppName = "DistoTransfer.exe";
-            DistoTransfer.Minimize();
-        }
-
-
         void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-
+            //Focuses on Waist1 field to await first measurement
             Keyboard.Focus(Waist1Measurement);
 
         }
@@ -98,10 +76,10 @@ namespace PieWaistMeasure
             //CSV conversion must go here with appropriate handling. Currently checking for decimal point at string position 2
             try
             {
-                //bool notEmpty = String.IsNullOrEmpty(arrayMeasurements[1, 1].Substring(0, 2));
-                //bool notEmpty1 = String.IsNullOrEmpty(arrayMeasurements[2, 1].Substring(0, 2));
-                //Update to accomodate PIE format. Conversions might be neccessary
-               
+
+                //This checks for a decimal place in the 2nd or 3rd array index positions.
+
+               //This checking could maybe be improved.
                 if ((arrayMeasurements[1, 1][2] == '.' || arrayMeasurements[2, 1][2] == '.') || (arrayMeasurements[1, 1][3] == '.' || arrayMeasurements[2, 1][3] == '.'))
                 {
                     measurement1 = ConvertStrToDec(arrayMeasurements[1, 1]);
@@ -162,7 +140,7 @@ namespace PieWaistMeasure
                 //bool notEmpty1 = String.IsNullOrEmpty(arrayMeasurements[2, 1].Substring(0, 2));
                 //Update to accomodate PIE format. Conversions might be neccessary
 
-                if ((arrayMeasurements[3, 1][2] == '.' )|| (arrayMeasurements[3, 1][3] == '.'))
+                if ((arrayMeasurements[3, 1][2] == '.' )|| (arrayMeasurements[3, 1][3] == '.'))//Checking for decimal point. Maybe this could be improved.
                 {
                     arrayMeasurements[3, 6] = "BluetoothInput";
                     string csv = ArrayToCsv(arrayMeasurements);
@@ -177,6 +155,7 @@ namespace PieWaistMeasure
             }
             catch
             {
+                //array indexing exception, user has entered either no data or some invalid data.
                 MessageBox.Show("Please enter some measurements.\n\nEnsure your measurements are equal.\n\n You may replace a measurement by clearing it and trying again.\n\n" +
                     "If entering manually, 1 decimal place is expected.\nFor Example 70 cm must be input as 70.0");
             }
@@ -258,8 +237,6 @@ namespace PieWaistMeasure
         {
             try
             {
-                //bool notEmpty = String.IsNullOrEmpty(arrayMeasurements[1, 1].Substring(0, 2));
-                //bool notEmpty1 = String.IsNullOrEmpty(arrayMeasurements[2, 1].Substring(0, 2));
                 //Update to accomodate PIE format. Conversions might be neccessary
 
                 //Set measurements to be obtained from manual entry and set manual input type
@@ -280,7 +257,7 @@ namespace PieWaistMeasure
                 }
             }
             catch
-            {
+            {   //array indexing exception, user has entered either no data or some invalid data.
                 MessageBox.Show("Please enter some measurements.\n\nEnsure your measurements are equal.\n\n You may replace a measurement by clearing it and trying again.\n\n" +
                     "If entering manually, 1 decimal place is expected.\nFor Example 70 cm must be input as 70.0");
             }
@@ -305,6 +282,7 @@ namespace PieWaistMeasure
 
         }
 
+        //Decalres a BT measurement
         private void checkBox_Unchecked(object sender, RoutedEventArgs e)
         {
             regexOverride = true;
@@ -492,7 +470,7 @@ namespace PieWaistMeasure
         private async void DeviceWatcher_Updated(DeviceWatcher sender, DeviceInformationUpdate deviceInfoUpdate)
         {
 
-            //if contains salter and salter is connectable stop all other handlers and connect  
+            //if contains PIE and PIE is connectable stop all other handlers and connect  
             await Task.Run(async () =>
             {
                 lock (this)
@@ -505,7 +483,7 @@ namespace PieWaistMeasure
                         BluetoothLEDeviceDisplay bleDeviceDisplay = FindBluetoothLEDeviceDisplay(deviceInfoUpdate.Id);
                         if (bleDeviceDisplay != null)
                         {
-                            // Device is already being displayed - update UX.
+                            // Device is already being displayed, Update infor with most recent data
                             bleDeviceDisplay.Update(deviceInfoUpdate);
                             DeviceInformation updatedDevice = bleDeviceDisplay.DeviceInformation;
                             //IsConnectable will be established once updated accordingly here. So function needs to be added that handles all devices.
@@ -522,6 +500,7 @@ namespace PieWaistMeasure
                             return;
                         }
 
+                        //left here as residual from orginal microsoft UWP app. Needs this code to properly function.
                         DeviceInformation deviceInfo = FindUnknownDevices(deviceInfoUpdate.Id);
                         if (deviceInfo != null)
                         {
@@ -539,6 +518,7 @@ namespace PieWaistMeasure
 
         }
 
+        //Takes the ID of found device and returns the displayDeviceType
         private BluetoothLEDeviceDisplay FindBluetoothLEDeviceDisplay(string id)
         {
             foreach (BluetoothLEDeviceDisplay bleDeviceDisplay in KnownDevices)
@@ -854,7 +834,7 @@ namespace PieWaistMeasure
             }
         }
 
-        //handle external windows with this class
+        //handle external windows with this class. left here in case other external processes are integrated.
         public class WindowControl
         {
             private string appName;  // the name field
