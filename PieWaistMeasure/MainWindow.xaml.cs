@@ -106,7 +106,7 @@ namespace PieWaistMeasure
                         button.IsEnabled = false;
                         
                         MessageBox.Show("Third measurement required.\n\nPlease take 10 seconds to re-position yourself for re-taking measurement.\n\n" +
-                        "3rd measurement will be enabled after 10 seconds of closing this message.");
+                        "3rd measurement will be enabled 10 seconds after closing this message.");
                         //Thread.Sleep(10000);
                         waiting3rdMeasurement.Visibility = Visibility.Visible;
                         repositionTimer = new System.Windows.Threading.DispatcherTimer();
@@ -197,24 +197,25 @@ namespace PieWaistMeasure
                         //enable submit final measurements.
                         Waist1Measurement.IsEnabled = false;
                         Waist2Measurement.IsEnabled = false;
+                        clear1.IsEnabled = false;
+                        clear2.IsEnabled = false;
                         button.IsEnabled = false;
                         button.Visibility = Visibility.Hidden;
                         button1.IsEnabled = false;
                         button1.Visibility = Visibility.Hidden;
                         button3.IsEnabled = false;
-                        MessageBox.Show("Third measurement required.\n\nPlease take 10 seconds to re-position yourself for re-taking measurement.\n\n" +
-                        "3rd measurement will be enabled after 10 seconds.");                                              
-                        button3.Visibility = Visibility.Hidden;
-                        textBlock6.Visibility = Visibility.Visible;
-                        textBlock5.Visibility = Visibility.Visible;
-                        textBlock8.Visibility = Visibility.Visible;
-                        Waist3Measurement.Visibility = Visibility.Visible;
-                        clear3.Visibility = Visibility.Visible;
                         button4.Visibility = Visibility.Visible;
-                        button4.IsEnabled = true;
-                        textBlock7.Visibility = Visibility.Visible;
-                        Waist3Measurement.IsEnabled = true;
-                        Waist3Measurement.Focus();
+                        button4.IsEnabled = false;
+                        isThirdMeasurement = true;
+                        waiting3rdMeasurement.Visibility = Visibility.Visible;
+                        MessageBox.Show("Third measurement required.\n\nPlease take 10 seconds to re-position yourself for re-taking measurement.\n\n" +
+                        "3rd measurement will be enabled 10 seconds after closing this message.");
+                        waiting3rdMeasurement.Visibility = Visibility.Visible;
+                        repositionTimer = new System.Windows.Threading.DispatcherTimer();
+                        repositionTimer.Tick += new EventHandler(repositionTimer_Tick);
+                        repositionTimer.Interval = new TimeSpan(0, 0, 10);
+                        repositionTimer.Start();
+
                     }
 
                 }
@@ -824,7 +825,7 @@ namespace PieWaistMeasure
             return convert;
         }
 
-        //This event fires once the 10 second re-positioning timer is up. Enabling H2 measurement input.
+        //This event fires once the 10 second re-positioning timer is up. Enabling H2 measurement input. COULD BE CLEANED UP
         DispatcherTimer repositionTimer;
         private void repositionTimer_Tick(object sender, EventArgs e)
         {
@@ -845,27 +846,45 @@ namespace PieWaistMeasure
             }
             else
             {
-                waiting3rdMeasurement.Visibility = Visibility.Hidden;
-                clear1.IsEnabled = false;
-                clear2.IsEnabled = false;
-                button.Visibility = Visibility.Hidden;
-                Waist1Measurement.IsEnabled = false;
-                Waist2Measurement.IsEnabled = false;
-                textBlock6.Visibility = Visibility.Visible;
-                textBlock5.Visibility = Visibility.Visible;
-                Waist3Measurement.Visibility = Visibility.Visible;
-                button1.Visibility = Visibility.Visible;
-                clear3.Visibility = Visibility.Visible;
-                Waist3Measurement.IsEnabled = true;
-                Waist3Measurement.Focus();
-                isThirdMeasurement = false;//Must reset so first to measurements can be re-taken
-                button.Visibility = Visibility.Hidden;
-                textBlock8.Visibility = Visibility.Visible;
-                Waist3Measurement.Visibility = Visibility.Visible;
-                button1.Visibility = Visibility.Visible;
-                textBlock7.Visibility = Visibility.Visible;
-                Waist3Measurement.IsEnabled = true;
-                Waist3Measurement.Focus();
+                if (manualMeasurement == false)
+                {
+                    waiting3rdMeasurement.Visibility = Visibility.Hidden;
+                    clear1.IsEnabled = false;
+                    clear2.IsEnabled = false;
+                    button.Visibility = Visibility.Hidden;
+                    Waist1Measurement.IsEnabled = false;
+                    Waist2Measurement.IsEnabled = false;
+                    textBlock6.Visibility = Visibility.Visible;
+                    textBlock5.Visibility = Visibility.Visible;
+                    Waist3Measurement.Visibility = Visibility.Visible;
+                    button1.Visibility = Visibility.Visible;
+                    clear3.Visibility = Visibility.Visible;
+                    Waist3Measurement.IsEnabled = true;
+                    Waist3Measurement.Focus();
+                    isThirdMeasurement = false;//Must reset so first to measurements can be re-taken
+                    button.Visibility = Visibility.Hidden;
+                    textBlock8.Visibility = Visibility.Visible;
+                    Waist3Measurement.Visibility = Visibility.Visible;
+                    textBlock7.Visibility = Visibility.Visible;
+                    Waist3Measurement.IsEnabled = true;
+                    Waist3Measurement.Focus();
+                }
+                else
+                {
+                    waiting3rdMeasurement.Visibility = Visibility.Hidden;
+                    button4.IsEnabled = true;
+                    button3.Visibility = Visibility.Hidden;
+                    textBlock6.Visibility = Visibility.Visible;
+                    textBlock5.Visibility = Visibility.Visible;
+                    textBlock8.Visibility = Visibility.Visible;
+                    Waist3Measurement.Visibility = Visibility.Visible;
+                    clear3.Visibility = Visibility.Visible;
+                    button4.Visibility = Visibility.Visible;
+                    button4.IsEnabled = true;
+                    textBlock7.Visibility = Visibility.Visible;
+                    Waist3Measurement.IsEnabled = true;
+                    Waist3Measurement.Focus();
+                }
             }
             timer.Stop();
             repositionTimer = null;
