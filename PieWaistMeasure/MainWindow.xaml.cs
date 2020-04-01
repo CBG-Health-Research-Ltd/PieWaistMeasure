@@ -69,6 +69,7 @@ namespace PieWaistMeasure
         }
 
         //Button to submit Bluetooth collected results of first two measurement fields. Success determined by no 1% difference.
+        bool isThirdMeasurement = false;
         private void button_Click(object sender, RoutedEventArgs e)
         {
             decimal measurement1;
@@ -97,24 +98,23 @@ namespace PieWaistMeasure
                     {
                         //Disable first two measurement boxes. Enable third measurement box, shift focus to third measurement, disable Done measuring Box, 
                         //enable submit final measurements.
-                        MessageBox.Show("Third measurement required.\n\nPlease take 10 seconds to re-position yourself for re-taking measurement.\n\n" +
-                        "3rd measurement will be enabled after 10 seconds of closing this message.");
-                        Thread.Sleep(10000);
+                        isThirdMeasurement = true;
                         Waist1Measurement.IsEnabled = false;
                         Waist2Measurement.IsEnabled = false;
                         clear1.IsEnabled = false;
                         clear2.IsEnabled = false;
                         button.IsEnabled = false;
-                        button.Visibility = Visibility.Hidden;
-                        textBlock6.Visibility = Visibility.Visible;
-                        textBlock5.Visibility = Visibility.Visible;
-                        textBlock8.Visibility = Visibility.Visible;
-                        Waist3Measurement.Visibility = Visibility.Visible;
-                        clear3.Visibility = Visibility.Visible;
-                        button1.Visibility = Visibility.Visible;
-                        textBlock7.Visibility = Visibility.Visible;
-                        Waist3Measurement.IsEnabled = true;
-                        Waist3Measurement.Focus();
+                        
+                        MessageBox.Show("Third measurement required.\n\nPlease take 10 seconds to re-position yourself for re-taking measurement.\n\n" +
+                        "3rd measurement will be enabled after 10 seconds of closing this message.");
+                        //Thread.Sleep(10000);
+                        waiting3rdMeasurement.Visibility = Visibility.Visible;
+                        repositionTimer = new System.Windows.Threading.DispatcherTimer();
+                        repositionTimer.Tick += new EventHandler(repositionTimer_Tick);
+                        repositionTimer.Interval = new TimeSpan(0, 0, 10);
+                        repositionTimer.Start();
+
+                        
                     }
                 }
                 else
@@ -195,9 +195,6 @@ namespace PieWaistMeasure
                     {
                         //Disable first two measurement boxes. Enable third measurement box, shift focus to third measurement, disable Done measuring Box, 
                         //enable submit final measurements.
-                        MessageBox.Show("Third measurement required.\n\nPlease take 10 seconds to re-position yourself for re-taking measurement.\n\n" +
-                        "3rd measurement will be enabled after 10 seconds.");
-                        Thread.Sleep(10000);
                         Waist1Measurement.IsEnabled = false;
                         Waist2Measurement.IsEnabled = false;
                         button.IsEnabled = false;
@@ -205,6 +202,8 @@ namespace PieWaistMeasure
                         button1.IsEnabled = false;
                         button1.Visibility = Visibility.Hidden;
                         button3.IsEnabled = false;
+                        MessageBox.Show("Third measurement required.\n\nPlease take 10 seconds to re-position yourself for re-taking measurement.\n\n" +
+                        "3rd measurement will be enabled after 10 seconds.");                                              
                         button3.Visibility = Visibility.Hidden;
                         textBlock6.Visibility = Visibility.Visible;
                         textBlock5.Visibility = Visibility.Visible;
@@ -297,8 +296,10 @@ namespace PieWaistMeasure
         }
 
         //Clearing measurements from individual fields
+        bool clearIsClicked = false;
         private void clear1_Click(object sender, RoutedEventArgs e)
         {
+            clearIsClicked = true;
             regexOverride = true;
             Application.Current.Dispatcher.Invoke(() => {Waist1Measurement.Clear();});
             Waist1Measurement.Focus();
@@ -335,18 +336,26 @@ namespace PieWaistMeasure
             //enable first 2 measurement fields
             Waist1Measurement.IsEnabled = true;
             Waist2Measurement.IsEnabled = true;
+            clear1.IsEnabled = true;
+            clear2.IsEnabled = true;
 
             if (manualMeasurement == true) //Enable the manualMeasurement == true button to perform submission calcs using the manually entered measurements and not timer entered measurements.
             {
                 button.IsEnabled = false;
                 button.Visibility = Visibility.Hidden;
+                button1.IsEnabled = false;
+                button1.Visibility = Visibility.Hidden;
                 button3.IsEnabled = true;
                 button3.Visibility = Visibility.Visible;
+                button4.IsEnabled = false;
+                button4.Visibility = Visibility.Hidden;
             }
             else //Bluetooth measuring so setting initial button again.
             {
                 button.IsEnabled = true;
                 button.Visibility = Visibility.Visible;
+                button1.IsEnabled = false;
+                button1.Visibility = Visibility.Hidden;
                 button3.IsEnabled = false;
                 button3.Visibility = Visibility.Hidden;
             }
@@ -367,6 +376,7 @@ namespace PieWaistMeasure
             previousInput = "";
             previousInput1 = "";
             previousInput2 = "";
+            clearIsClicked = false;
         }
 
         //Updating the connection status.
@@ -636,10 +646,23 @@ namespace PieWaistMeasure
             {
                 arrayMeasurements[1, 0] = "WA";
                 arrayMeasurements[1, 1] = Waist1Measurement.Text;
-                MessageBox.Show("Please take 10 seconds to re-position yourself for re-taking measurement.\n\n" +
-                    "2nd measurement will be enabled after 10 seconds.");
-                Thread.Sleep(10000);
-                Keyboard.Focus(Waist2Measurement);
+                
+                if (clearIsClicked == false)
+                {
+                    waiting.Visibility = Visibility.Visible;
+                    button.IsEnabled = false;
+                    Waist1Measurement.IsEnabled = false;
+                    Waist2Measurement.IsEnabled = false;
+                    clear1.IsEnabled = false;
+                    clear2.IsEnabled = false;
+                    MessageBox.Show("Please take 10 seconds to re-position yourself for re-taking measurement.\n\n" +
+                        "2nd measurement will be enabled 10 seconds after closing this message.");
+                    repositionTimer = new System.Windows.Threading.DispatcherTimer();
+                    repositionTimer.Tick += new EventHandler(repositionTimer_Tick);
+                    repositionTimer.Interval = new TimeSpan(0, 0, 10);
+                    repositionTimer.Start();
+                    clearIsClicked = false;
+                }
             }
             else if(waist1orwaist2 == "waist2")
             {
@@ -799,6 +822,53 @@ namespace PieWaistMeasure
         {
             decimal convert = Convert.ToDecimal(value);
             return convert;
+        }
+
+        //This event fires once the 10 second re-positioning timer is up. Enabling H2 measurement input.
+        DispatcherTimer repositionTimer;
+        private void repositionTimer_Tick(object sender, EventArgs e)
+        {
+            var timer = sender as DispatcherTimer;
+            if (timer == null)
+            {
+                return;
+            }
+            if (isThirdMeasurement == false)
+            {
+                button.IsEnabled = true;
+                waiting.Visibility = Visibility.Hidden;
+                clear1.IsEnabled = true;
+                clear2.IsEnabled = true;
+                Waist2Measurement.IsEnabled = true;
+                Waist1Measurement.IsEnabled = true;
+                Keyboard.Focus(Waist2Measurement);
+            }
+            else
+            {
+                waiting3rdMeasurement.Visibility = Visibility.Hidden;
+                clear1.IsEnabled = false;
+                clear2.IsEnabled = false;
+                button.Visibility = Visibility.Hidden;
+                Waist1Measurement.IsEnabled = false;
+                Waist2Measurement.IsEnabled = false;
+                textBlock6.Visibility = Visibility.Visible;
+                textBlock5.Visibility = Visibility.Visible;
+                Waist3Measurement.Visibility = Visibility.Visible;
+                button1.Visibility = Visibility.Visible;
+                clear3.Visibility = Visibility.Visible;
+                Waist3Measurement.IsEnabled = true;
+                Waist3Measurement.Focus();
+                isThirdMeasurement = false;//Must reset so first to measurements can be re-taken
+                button.Visibility = Visibility.Hidden;
+                textBlock8.Visibility = Visibility.Visible;
+                Waist3Measurement.Visibility = Visibility.Visible;
+                button1.Visibility = Visibility.Visible;
+                textBlock7.Visibility = Visibility.Visible;
+                Waist3Measurement.IsEnabled = true;
+                Waist3Measurement.Focus();
+            }
+            timer.Stop();
+            repositionTimer = null;
         }
 
         //Percentage check which is global for all BT mesurements.
