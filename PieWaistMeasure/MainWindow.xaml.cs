@@ -80,7 +80,7 @@ namespace PieWaistMeasure
                 //This checks for a decimal place in the 2nd or 3rd array index positions.
 
                //This checking could maybe be improved.
-                if ((arrayMeasurements[1, 1][2] == '.' || arrayMeasurements[2, 1][2] == '.') || (arrayMeasurements[1, 1][3] == '.' || arrayMeasurements[2, 1][3] == '.'))
+                if ((arrayMeasurements[1, 1][2] == '.' || arrayMeasurements[1, 1][3] == '.') && (arrayMeasurements[2, 1][2] == '.' || arrayMeasurements[2, 1][3] == '.'))
                 {
                     measurement1 = ConvertStrToDec(arrayMeasurements[1, 1]);
                     measurement2 = ConvertStrToDec(arrayMeasurements[2, 1]);
@@ -181,7 +181,7 @@ namespace PieWaistMeasure
                 arrayMeasurements[2, 6] = "ManualInput";
 
                 //Checking for decimal point for all weight possibilities. Using same verification as BT measurement.
-                if ((arrayMeasurements[1, 1][2] == '.' && arrayMeasurements[2, 1][2] == '.') || (arrayMeasurements[1, 1][3] == '.' && arrayMeasurements[2, 1][3] == '.'))
+                if ((arrayMeasurements[1, 1][2] == '.' || arrayMeasurements[1, 1][3] == '.') && (arrayMeasurements[2, 1][2] == '.' || arrayMeasurements[2, 1][3] == '.'))
                 {
                     measurement1 = ConvertStrToDec(arrayMeasurements[1, 1]);
                     measurement2 = ConvertStrToDec(arrayMeasurements[2, 1]);
