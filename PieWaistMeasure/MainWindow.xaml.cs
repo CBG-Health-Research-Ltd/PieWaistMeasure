@@ -104,10 +104,11 @@ namespace PieWaistMeasure
                         clear1.IsEnabled = false;
                         clear2.IsEnabled = false;
                         button.IsEnabled = false;
-                        
+                        checkBox.IsEnabled = false;
                         MessageBox.Show("Third measurement required.\n\nPlease take 10 seconds to re-position yourself for re-taking measurement.\n\n" +
                         "3rd measurement will be enabled 10 seconds after closing this message.");
                         //Thread.Sleep(10000);
+                        
                         waiting3rdMeasurement.Visibility = Visibility.Visible;
                         repositionTimer = new System.Windows.Threading.DispatcherTimer();
                         repositionTimer.Tick += new EventHandler(repositionTimer_Tick);
@@ -125,7 +126,7 @@ namespace PieWaistMeasure
             }
             catch
             {
-                MessageBox.Show("Please enter some measurements.\n\nEnsure your measurements are equal.\n\n You may replace a measurement by clearing it and trying again.\n\n" +
+                MessageBox.Show("Please enter some measurements.\n\nYou may replace a measurement by clearing it and trying again.\n\n" +
                     "If entering manually, 1 decimal place is expected.\nFor Example 70 cm must be input as 70.0");
             }
 
@@ -136,9 +137,11 @@ namespace PieWaistMeasure
         {
             try
             {
-                //bool notEmpty = String.IsNullOrEmpty(arrayMeasurements[1, 1].Substring(0, 2));
-                //bool notEmpty1 = String.IsNullOrEmpty(arrayMeasurements[2, 1].Substring(0, 2));
-                //Update to accomodate PIE format. Conversions might be neccessary
+                string[] respondentInfo = GetRespondentIdentifiers();
+                arrayMeasurements[3, 2] = respondentInfo[0];
+                arrayMeasurements[3, 3] = respondentInfo[1];
+                arrayMeasurements[3, 4] = respondentInfo[2];
+                arrayMeasurements[3, 5] = respondentInfo[3];
 
                 if ((arrayMeasurements[3, 1][2] == '.' )|| (arrayMeasurements[3, 1][3] == '.'))//Checking for decimal point. Maybe this could be improved.
                 {
@@ -156,7 +159,7 @@ namespace PieWaistMeasure
             catch
             {
                 //array indexing exception, user has entered either no data or some invalid data.
-                MessageBox.Show("Please enter some measurements.\n\nEnsure your measurements are equal.\n\n You may replace a measurement by clearing it and trying again.\n\n" +
+                MessageBox.Show("Please enter some measurements.\n\nYou may replace a measurement by clearing it and trying again.\n\n" +
                     "If entering manually, 1 decimal place is expected.\nFor Example 70 cm must be input as 70.0");
             }
         }
@@ -208,6 +211,7 @@ namespace PieWaistMeasure
                         button4.IsEnabled = false;
                         isThirdMeasurement = true;
                         waiting3rdMeasurement.Visibility = Visibility.Visible;
+                        checkBox.IsEnabled = false;
                         MessageBox.Show("Third measurement required.\n\nPlease take 10 seconds to re-position yourself for re-taking measurement.\n\n" +
                         "3rd measurement will be enabled 10 seconds after closing this message.");
                         waiting3rdMeasurement.Visibility = Visibility.Visible;
@@ -227,7 +231,7 @@ namespace PieWaistMeasure
             }
             catch
             {   //array indexing exception, user has entered either no data or some invalid data.
-                MessageBox.Show("Please enter some measurements.\n\nEnsure your measurements are equal.\n\n You may replace a measurement by clearing it and trying again.\n\n" +
+                MessageBox.Show("Please enter some measurements.\n\nYou may replace a measurement by clearing it and trying again.\n\n" +
                     "If entering manually, 1 decimal place is expected.\nFor Example 70 cm must be input as 70.0");
             }
         }
@@ -238,6 +242,11 @@ namespace PieWaistMeasure
             try
             {
                 //Update to accomodate PIE format. Conversions might be neccessary
+                string[] respondentInfo = GetRespondentIdentifiers();
+                arrayMeasurements[3, 2] = respondentInfo[0];
+                arrayMeasurements[3, 3] = respondentInfo[1];
+                arrayMeasurements[3, 4] = respondentInfo[2];
+                arrayMeasurements[3, 5] = respondentInfo[3];
 
                 //Set measurements to be obtained from manual entry and set manual input type
                 arrayMeasurements[3, 0] = "WA";
@@ -258,7 +267,7 @@ namespace PieWaistMeasure
             }
             catch
             {   //array indexing exception, user has entered either no data or some invalid data.
-                MessageBox.Show("Please enter some measurements.\n\nEnsure your measurements are equal.\n\n You may replace a measurement by clearing it and trying again.\n\n" +
+                MessageBox.Show("Please enter some measurements.\n\nYou may replace a measurement by clearing it and trying again.\n\n" +
                     "If entering manually, 1 decimal place is expected.\nFor Example 70 cm must be input as 70.0");
             }
         }
@@ -332,7 +341,12 @@ namespace PieWaistMeasure
             arrayMeasurements[3, 1] = null;
             arrayMeasurements[1, 6] = null;
             arrayMeasurements[2, 6] = null;
+            arrayMeasurements[3, 0] = null;
             arrayMeasurements[3, 6] = null;
+            arrayMeasurements[3, 2] = null;
+            arrayMeasurements[3, 3] = null;
+            arrayMeasurements[3, 4] = null;
+            arrayMeasurements[3, 5] = null;
 
             //enable first 2 measurement fields
             Waist1Measurement.IsEnabled = true;
@@ -359,6 +373,8 @@ namespace PieWaistMeasure
                 button1.Visibility = Visibility.Hidden;
                 button3.IsEnabled = false;
                 button3.Visibility = Visibility.Hidden;
+                button4.IsEnabled = false;
+                button4.Visibility = Visibility.Hidden;
             }
 
             //clear visibility of all things related to taking the third measurement
@@ -378,6 +394,7 @@ namespace PieWaistMeasure
             previousInput1 = "";
             previousInput2 = "";
             clearIsClicked = false;
+            isThirdMeasurement = false;
         }
 
         //Updating the connection status.
@@ -617,10 +634,10 @@ namespace PieWaistMeasure
             arrayMeasurements[2, 3] = respondentInfo[1];
             arrayMeasurements[2, 4] = respondentInfo[2];
             arrayMeasurements[2, 5] = respondentInfo[3];
-            arrayMeasurements[3, 2] = respondentInfo[0];
-            arrayMeasurements[3, 3] = respondentInfo[1];
-            arrayMeasurements[3, 4] = respondentInfo[2];
-            arrayMeasurements[3, 5] = respondentInfo[3];
+            //arrayMeasurements[3, 2] = respondentInfo[0];
+            //arrayMeasurements[3, 3] = respondentInfo[1];
+            //arrayMeasurements[3, 4] = respondentInfo[2];
+            //arrayMeasurements[3, 5] = respondentInfo[3];
 
 
         }
@@ -638,6 +655,7 @@ namespace PieWaistMeasure
         {
             
             var timer = sender as DispatcherTimer; // WPF
+
             if (timer == null)
             {
                 return;
@@ -829,6 +847,7 @@ namespace PieWaistMeasure
         DispatcherTimer repositionTimer;
         private void repositionTimer_Tick(object sender, EventArgs e)
         {
+            checkBox.IsEnabled = true;
             var timer = sender as DispatcherTimer;
             if (timer == null)
             {
@@ -858,15 +877,13 @@ namespace PieWaistMeasure
                     textBlock5.Visibility = Visibility.Visible;
                     Waist3Measurement.Visibility = Visibility.Visible;
                     button1.Visibility = Visibility.Visible;
+                    button1.IsEnabled = true;
                     clear3.Visibility = Visibility.Visible;
                     Waist3Measurement.IsEnabled = true;
-                    Waist3Measurement.Focus();
                     isThirdMeasurement = false;//Must reset so first to measurements can be re-taken
                     button.Visibility = Visibility.Hidden;
                     textBlock8.Visibility = Visibility.Visible;
-                    Waist3Measurement.Visibility = Visibility.Visible;
                     textBlock7.Visibility = Visibility.Visible;
-                    Waist3Measurement.IsEnabled = true;
                     Waist3Measurement.Focus();
                 }
                 else
@@ -880,7 +897,6 @@ namespace PieWaistMeasure
                     Waist3Measurement.Visibility = Visibility.Visible;
                     clear3.Visibility = Visibility.Visible;
                     button4.Visibility = Visibility.Visible;
-                    button4.IsEnabled = true;
                     textBlock7.Visibility = Visibility.Visible;
                     Waist3Measurement.IsEnabled = true;
                     Waist3Measurement.Focus();
