@@ -81,7 +81,7 @@ namespace PieWaistMeasure
                 //This checks for a decimal place in the 2nd or 3rd array index positions.
 
                //This checking could maybe be improved.
-                if ((arrayMeasurements[1, 1][2] == '.' || arrayMeasurements[1, 1][3] == '.') && (arrayMeasurements[2, 1][2] == '.' || arrayMeasurements[2, 1][3] == '.'))
+                if (arrayMeasurements[1, 1].Contains(".") && check1DecimalPlace(arrayMeasurements[1, 1]) == true && arrayMeasurements[2, 1].Contains(".") && check1DecimalPlace(arrayMeasurements[2, 1]) == true)
                 {
                     measurement1 = ConvertStrToDec(arrayMeasurements[1, 1]);
                     measurement2 = ConvertStrToDec(arrayMeasurements[2, 1]);
@@ -143,7 +143,7 @@ namespace PieWaistMeasure
                 arrayMeasurements[3, 4] = respondentInfo[2];
                 arrayMeasurements[3, 5] = respondentInfo[3];
 
-                if ((arrayMeasurements[3, 1][2] == '.' )|| (arrayMeasurements[3, 1][3] == '.'))//Checking for decimal point. Maybe this could be improved.
+                if (arrayMeasurements[3, 1].Contains(".") && check1DecimalPlace(arrayMeasurements[3, 1]))//Checking for decimal point. Maybe this could be improved.
                 {
                     arrayMeasurements[3, 6] = "BluetoothInput";
                     string csv = ArrayToCsv(arrayMeasurements);
@@ -184,7 +184,7 @@ namespace PieWaistMeasure
                 arrayMeasurements[2, 6] = "ManualInput";
 
                 //Checking for decimal point for all weight possibilities. Using same verification as BT measurement.
-                if ((arrayMeasurements[1, 1][2] == '.' || arrayMeasurements[1, 1][3] == '.') && (arrayMeasurements[2, 1][2] == '.' || arrayMeasurements[2, 1][3] == '.'))
+                if (arrayMeasurements[1, 1].Contains(".") && check1DecimalPlace(arrayMeasurements[1, 1]) == true && arrayMeasurements[2, 1].Contains(".") && check1DecimalPlace(arrayMeasurements[2, 1]) == true)
                 {
                     measurement1 = ConvertStrToDec(arrayMeasurements[1, 1]);
                     measurement2 = ConvertStrToDec(arrayMeasurements[2, 1]);
@@ -253,7 +253,7 @@ namespace PieWaistMeasure
                 arrayMeasurements[3, 1] = Waist3Measurement.Text;
                 arrayMeasurements[3, 6] = "ManualInput";
 
-                if ((arrayMeasurements[3, 1][2] == '.') || (arrayMeasurements[3, 1][3] == '.'))
+                if (arrayMeasurements[3, 1].Contains(".") && check1DecimalPlace(arrayMeasurements[3, 1]))
                 {
                     string csv = ArrayToCsv(arrayMeasurements);
                     WriteCSVFile(csv);
@@ -936,6 +936,27 @@ namespace PieWaistMeasure
             else
             {
                 return false; // All other cases false as value1 and value2 will be equal
+            }
+        }
+
+        private bool check1DecimalPlace(string value)
+        {
+            try
+            {
+                int DPindex = value.IndexOf('.');
+                int i;
+                if (int.TryParse(value[DPindex + 1].ToString(), out i))
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch
+            {
+                return false;
             }
         }
 
