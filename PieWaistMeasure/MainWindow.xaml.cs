@@ -939,6 +939,7 @@ namespace PieWaistMeasure
             }
         }
 
+        //ensures a numeric is placed after the decimal place, used for manual input
         private bool check1DecimalPlace(string value)
         {
             try
