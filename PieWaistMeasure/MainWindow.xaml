@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PieWaistMeasure"
         mc:Ignorable="d"
-    Title="MainWindow" Height="741.2" Width="515">
+    Title="Waist Measurement" Height="741.2" Width="515">
     <Grid Margin="0,10,-82,0" Height="725" VerticalAlignment="Top">
         <TextBlock x:Name="AppTitle" HorizontalAlignment="Left" Margin="32,29,0,635" Text="Waist Measurement" TextWrapping="Wrap" Width="429" FontSize="32" TextAlignment="Center" Foreground="#FF4949A9"/>
         <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="62,95,0,0" Text="Please turn on the PIE device to connect Bluetooth" TextWrapping="Wrap" VerticalAlignment="Top" Width="371" FontSize="16" Height="30"/>
