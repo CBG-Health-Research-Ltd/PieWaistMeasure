@@ -831,8 +831,8 @@ namespace PieWaistMeasure
         private void WriteCSVFile(string csvMeasurements)
         {
 
-            System.IO.Directory.CreateDirectory(@"C:\BodyMeasurements\WaistMeasurements");
-            string CSVFileName = @"C:\BodyMeasurements\WaistMeasurements\" + "WaistMeasurements_" + DateTime.Now.ToString("yyyy-MM-ddTHH-mm-ss") + ".csv";
+            System.IO.Directory.CreateDirectory(@"C:\NZHS\BodyMeasurements\WaistMeasurements");
+            string CSVFileName = @"C:\NZHS\BodyMeasurements\WaistMeasurements\" + "WaistMeasurements_" + DateTime.Now.ToString("yyyy-MM-ddTHH-mm-ss") + ".csv";
 
             System.IO.File.WriteAllText(CSVFileName, csvMeasurements);
         }
