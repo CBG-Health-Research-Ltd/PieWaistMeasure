@@ -674,9 +674,10 @@ namespace PieWaistMeasure
                     Waist2Measurement.IsEnabled = false;
                     clear1.IsEnabled = false;
                     clear2.IsEnabled = false;
+                    checkBox.IsEnabled = false;
                     MessageBox.Show("Please take 10 seconds to re-position yourself for re-taking measurement.\n\n" +
                         "2nd measurement will be enabled 10 seconds after closing this message.");
-                    repositionTimer = new System.Windows.Threading.DispatcherTimer();
+                    repositionTimer = new System.Windows.Threading.DispatcherTimer();                   
                     repositionTimer.Tick += new EventHandler(repositionTimer_Tick);
                     repositionTimer.Interval = new TimeSpan(0, 0, 10);
                     repositionTimer.Start();
